@@ -1,7 +1,6 @@
 name: release pull request
 
 on:
-  workflow_dispatch:
   pull_request:
     types:
       - opened
