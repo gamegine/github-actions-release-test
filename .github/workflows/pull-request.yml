@@ -68,7 +68,6 @@ jobs:
         with:
           script: |
             const { owner, repo } = context.repo;
-      
             const prs = await github.paginate(
               github.rest.pulls.list,
               {
@@ -77,40 +76,30 @@ jobs:
                 state: 'open'
               }
             );
-      
             const existingPr = prs.find(
               pr => 
                 pr.head.ref === 'rc' && 
                 pr.base.ref === '${{ github.event.repository.default_branch }}'
             );
             core.setOutput('exists', existingPr ? 'true' : 'false');
-      
             if (existingPr) {
               console.log(`PR already exists: #${existingPr.number}`);
             }
 
       - name: Create Release pr
         if: steps.pr_check.outputs.exists != 'true'
-        run: |
-          echo "No RC -> MAIN PR exists, creating one..."
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            // create PR
+            const pr = await github.rest.pulls.create({
+              owner,
+              repo,
+              head: 'rc',
+              base: '${{ github.event.repository.default_branch }}',
+              title: `Release Candidate`,
+              body: 'Automated Release Candidate PR'
+            });
+            console.log(`Created PR: #${pr.data.number}`);
