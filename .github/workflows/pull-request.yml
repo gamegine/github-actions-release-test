@@ -1,6 +1,7 @@
 name: pull request
 
 on:
+  workflow_dispatch: # Manual trigger from GitHub Actions UI
   pull_request:
     types:
       - opened
@@ -61,7 +62,7 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - name: check release pr
+      - name: Check Release pr
         id: pr_check
         uses: actions/github-script@v9
         with:
@@ -87,6 +88,27 @@ jobs:
             if (existingPr) {
               console.log(`PR already exists: #${existingPr.number}`);
             }
+
+      - name: Create Release pr
+        if: steps.pr_check.outputs.exists != 'true'
+        run: |
+          echo "No RC -> MAIN PR exists, creating one..."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
